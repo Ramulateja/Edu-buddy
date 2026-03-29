@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduBuddy — AI Powered Study Companion</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@100..900&family=Jost:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="sidebar">
+
+  <!-- Brand Logo -->
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-icon">🎓</div>
+      <div>
+        <div class="logo-text">Edu<span>Buddy</span></div>
+        <div class="logo-tagline">AI Study Companion</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Links -->
+  <div class="nav">
+    <div class="nav-label">Overview</div>
+
+    <div class="nav-item active" data-section="dashboard"
+         onclick="navigate('dashboard', this)">
+      <span class="nav-icon">🏠</span> Dashboard
+    </div>
+
+    <div class="nav-label">Learning</div>
+
+    <div class="nav-item" data-section="tutor"
+         onclick="navigate('tutor', this)">
+      <span class="nav-icon">🤖</span> AI Tutor
+      <span class="nav-badge">AI</span>
+    </div>
+
+    <div class="nav-item" data-section="roadmap"
+         onclick="navigate('roadmap', this)">
+      <span class="nav-icon">🗺️</span> Learning Roadmap
+    </div>
+
+    <div class="nav-item" data-section="quiz"
+         onclick="navigate('quiz', this)">
+      <span class="nav-icon">🧠</span> Quiz Generator
+    </div>
+
+    <div class="nav-label">Track</div>
+
+    <div class="nav-item" data-section="progress"
+         onclick="navigate('progress', this)">
+      <span class="nav-icon">📊</span> Progress Tracker
+    </div>
+
+    <div class="nav-item" data-section="profile"
+         onclick="navigate('profile', this)">
+      <span class="nav-icon">👤</span> Profile
+    </div>
+  </div>
+
+  <!-- User info at the bottom -->
+  <div class="sidebar-footer">
+    <div class="sidebar-user"
+         onclick="navigate('profile', document.querySelector('[data-section=profile]'))">
+      <div class="user-avatar-sm" id="sidebar-avatar">?</div>
+      <div class="user-info-sm">
+        <div class="user-name-sm" id="sidebar-name">Set up profile</div>
+        <div class="user-role-sm" id="sidebar-role">Student</div>
+      </div>
+      <span style="font-size:14px;color:var(--text3)">⚙️</span>
+    </div>
+  </div>
+
+</nav>
+<div class="main">
+  <header class="topbar">
+    <div class="page-title" id="page-title">Dashboard</div>
+    <div class="topbar-right">
+      <div class="topbar-btn" title="Notifications">🔔</div>
+      <div class="topbar-btn" title="Help">❓</div>
+    </div>
+  </header>
+
+  <div class="content">
+    <section class="section active" id="section-dashboard">
+      <div class="dashboard-welcome">
+        <h2 id="db-welcome-name">Welcome back, Learner! 👋</h2>
+        <p>Here's an overview of your learning journey. Keep up the great work!</p>
+      </div>
+      <div class="dashboard-stats">
+        <div class="stat-card">
+          <div class="stat-card-icon">📚</div>
+          <div class="stat-card-value" id="db-topics">0</div>
+          <div class="stat-card-label">Topics Tracked</div>
+          <div class="stat-card-sub">Total learning goals</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">⚡</div>
+          <div class="stat-card-value" id="db-skills">0</div>
+          <div class="stat-card-label">Skills Listed</div>
+          <div class="stat-card-sub">In your profile</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">🔥</div>
+          <div class="stat-card-value" id="db-streak">0</div>
+          <div class="stat-card-label">Day Streak</div>
+          <div class="stat-card-sub">Keep it going!</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">🎯</div>
+          <div class="stat-card-value" id="db-progress">0%</div>
+          <div class="stat-card-label">Completion Rate</div>
+          <div class="stat-card-sub">Goals completed</div>
+        </div>
+      </div>
+      <div class="dashboard-grid">
+
+        <!-- AI Study Recommendations -->
+        <div class="card">
+          <div class="card-title">💡 Smart Study Recommendations</div>
+          <div id="recommendations-list">
+            <div class="rec-loading">Loading recommendations…</div>
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-outline" style="font-size:12px;padding:8px 16px;"
+                    onclick="loadRecommendations()">
+              🔄 Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="card-title">⚡ Quick Actions</div>
+          <div class="quick-actions">
+            <div class="quick-action-btn"
+                 onclick="navigate('tutor', document.querySelector('[data-section=tutor]'))">
+              <span>🤖</span>
+              <div class="quick-action-label">Ask AI Tutor</div>
+            </div>
+            <div class="quick-action-btn"
+                 onclick="navigate('roadmap', document.querySelector('[data-section=roadmap]'))">
+              <span>🗺️</span>
+              <div class="quick-action-label">Generate Roadmap</div>
+            </div>
+            <div class="quick-action-btn"
+                 onclick="navigate('quiz', document.querySelector('[data-section=quiz]'))">
+              <span>🧠</span>
+              <div class="quick-action-label">Take a Quiz</div>
+            </div>
+            <div class="quick-action-btn"
+                 onclick="navigate('progress', document.querySelector('[data-section=progress]'))">
+              <span>📊</span>
+              <div class="quick-action-label">Track Progress</div>
+            </div>
+            <div class="quick-action-btn"
+                 onclick="navigate('profile', document.querySelector('[data-section=profile]'))">
+              <span>👤</span>
+              <div class="quick-action-label">Edit Profile</div>
+            </div>
+            <div class="quick-action-btn"
+                 onclick="navigate('progress', document.querySelector('[data-section=progress]'));toggleAddGoal()">
+              <span>➕</span>
+              <div class="quick-action-label">Add Goal</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /dashboard-grid -->
+
+      <!-- Recent Activity (mini) -->
+      <div class="card">
+        <div class="card-title">📅 Recent Activity</div>
+        <div id="activity-list-dash">
+          <div class="activity-item">
+            <div class="activity-dot">📘</div>
+            <div><div class="activity-text">Start learning to track your activity here</div></div>
+          </div>
+        </div>
+      </div>
+
+    </section><!-- /section-dashboard -->
+
+
+    <!-- ══════════════════════════════
+         SECTION 2 — AI TUTOR
+    ══════════════════════════════ -->
+    <section class="section" id="section-tutor">
+
+      <p class="section-intro">
+        Your personal AI learning mentor. Ask anything — concepts, study plans,
+        explanations, or what to learn next.
+      </p>
+
+      <!-- Chat layout -->
+      <div class="tutor-wrap">
+
+        <!-- Chat window -->
+        <div class="chat-main">
+          <div class="chat-header">
+            <div class="ai-avatar">🎓</div>
+            <div>
+              <div class="ai-name">EduBuddy AI Tutor</div>
+              <div class="ai-status">
+                <span class="status-dot"></span> Online
+              </div>
+            </div>
+          </div>
+
+          <!-- Messages -->
+          <div class="chat-messages" id="chat-messages">
+            <div class="msg ai">
+              <div class="msg-avatar">🎓</div>
+              <div>
+                <div class="msg-bubble">
+                  Hey there! 👋 I'm EduBuddy AI — your personal learning mentor.<br><br>
+                  I can help you <strong>understand any concept</strong>, create a study plan,
+                  explain tricky topics, or tell you what to learn next.<br>
+                  What would you like to learn today?
+                </div>
+                <div class="msg-time">Just now</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input -->
+          <div class="chat-input-area">
+            <textarea class="chat-input" id="chat-input" rows="1"
+              placeholder="Ask anything — topics, concepts, study tips…"
+              onkeydown="handleChatKey(event)"></textarea>
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+          </div>
+        </div><!-- /chat-main -->
+
+        <!-- Right sidebar -->
+        <div class="tutor-sidebar">
+          <div class="card" style="padding:18px;">
+            <div class="card-title" style="font-size:13px;margin-bottom:12px;">
+              💡 Study Topics
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div class="quick-topic" onclick="askQuick(this)">
+                <div class="quick-topic-label">🐍 Programming</div>
+                Explain Python list comprehensions with examples
+              </div>
+              <div class="quick-topic" onclick="askQuick(this)">
+                <div class="quick-topic-label">📐 Math</div>
+                How does gradient descent work in machine learning?
+              </div>
+              <div class="quick-topic" onclick="askQuick(this)">
+                <div class="quick-topic-label">🌐 Web Dev</div>
+                What is the difference between let, const and var?
+              </div>
+              <div class="quick-topic" onclick="askQuick(this)">
+                <div class="quick-topic-label">🔒 Security</div>
+                Explain SQL injection and how to prevent it
+              </div>
+              <div class="quick-topic" onclick="askQuick(this)">
+                <div class="quick-topic-label">📊 Data</div>
+                What is the difference between supervised and unsupervised learning?
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px;">
+            <div class="card-title" style="font-size:13px;margin-bottom:8px;">
+              💬 Session
+            </div>
+            <div style="font-size:28px;font-family:'Syne',sans-serif;font-weight:800;"
+                 id="msg-count">1</div>
+            <div style="font-size:12px;color:var(--text2);">Messages this session</div>
+          </div>
+        </div><!-- /tutor-sidebar -->
+
+      </div><!-- /tutor-wrap -->
+    </section><!-- /section-tutor -->
+
+
+    <!-- ══════════════════════════════
+         SECTION 3 — LEARNING ROADMAP
+    ══════════════════════════════ -->
+    <section class="section" id="section-roadmap">
+
+      <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px;">
+        Learning Roadmap
+      </h2>
+      <p class="section-intro">
+        Generate a structured, personalized learning roadmap — from beginner to advanced.
+        Fill the quick form or let the AI guide you step by step.
+      </p>
+
+      <!-- Tab switcher -->
+      <div class="roadmap-tabs">
+        <button class="rm-tab active" onclick="switchRmTab('form', this)">📋 Quick Form</button>
+        <button class="rm-tab"        onclick="switchRmTab('guide', this)">🤖 AI Guide</button>
+        <button class="rm-tab" id="result-tab-btn" style="display:none;"
+                onclick="switchRmTab('result', this)">🗺️ View Roadmap</button>
+      </div>
+
+      <!-- Panel: Quick Form -->
+      <div class="rm-panel active" id="rm-panel-form">
+        <div class="card">
+          <div class="card-title">📋 What do you want to learn?</div>
+          <div class="rm-form-grid">
+            <div class="form-group">
+              <label class="form-label" for="rm-subject">Subject / Skill</label>
+              <select class="form-select" id="rm-subject">
+                <option value="">Choose a subject</option>
+                <option>Web Development</option>
+                <option>Data Science &amp; AI</option>
+                <option>Cybersecurity</option>
+                <option>UI/UX Design</option>
+                <option>Cloud &amp; DevOps</option>
+                <option>Mobile Development</option>
+                <option>DSA &amp; Programming</option>
+                <option>Digital Marketing</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="rm-level">Current Level</label>
+              <select class="form-select" id="rm-level">
+                <option value="">Select level</option>
+                <option>Complete Beginner</option>
+                <option>Know the basics</option>
+                <option>Intermediate</option>
+                <option>Advanced</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="rm-goal">Learning Goal</label>
+              <select class="form-select" id="rm-goal">
+                <option value="">What do you want?</option>
+                <option>Get a job</option>
+                <option>Build a project</option>
+                <option>Upskill for promotion</option>
+                <option>Freelance</option>
+                <option>Academic / study</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="rm-time">Weekly Study Time</label>
+              <select class="form-select" id="rm-time">
+                <option value="">Select time</option>
+                <option>1–3 hrs (light)</option>
+                <option>3–7 hrs (regular)</option>
+                <option>7–15 hrs (focused)</option>
+                <option>15+ hrs (intensive)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="rm-existing">Topics / Skills you already know (optional)</label>
+            <input class="form-input" id="rm-existing" type="text"
+                   placeholder="e.g. HTML basics, Python syntax, Photoshop…" />
+          </div>
+          <button class="btn btn-primary" onclick="generateRoadmapFromForm()">
+            🗺️ Generate My Roadmap
+          </button>
+        </div>
+      </div><!-- /rm-panel-form -->
+
+      <!-- Panel: AI Guide -->
+      <div class="rm-panel" id="rm-panel-guide">
+        <div class="ai-q-progress-bar">
+          <div class="ai-q-progress-fill" id="rm-q-progress" style="width:0%"></div>
+        </div>
+        <div class="ai-q-wrap">
+          <div class="ai-q-icon" id="rm-q-icon">🌟</div>
+          <div class="ai-q-step" id="rm-q-step">STEP 1 OF 5</div>
+          <div class="ai-q-text" id="rm-q-text">
+            What subject or skill do you want to learn?
+          </div>
+          <!-- Option buttons injected by JS -->
+          <div class="ai-options" id="rm-q-options"></div>
+          <!-- Text input for step 5 -->
+          <div class="ai-q-input-wrap" id="rm-q-input-wrap" style="display:none;">
+            <input class="ai-q-input" id="rm-q-input" type="text"
+                   placeholder="Type your answer…"
+                   onkeydown="if(event.key==='Enter') nextRmQuestion()" />
+            <button class="btn btn-primary" onclick="nextRmQuestion()">Next →</button>
+          </div>
+        </div>
+      </div><!-- /rm-panel-guide -->
+
+      <!-- Panel: Result (injected by JS) -->
+      <div class="rm-panel" id="rm-panel-result"></div>
+
+    </section><!-- /section-roadmap -->
+
+
+    <!-- ══════════════════════════════
+         SECTION 4 — QUIZ GENERATOR
+    ══════════════════════════════ -->
+    <section class="section" id="section-quiz">
+
+      <h2 style="font-family:Poppins, sans-serif;font-weight:800;font-size:22px;margin-bottom:6px;">
+        Quiz Generator
+      </h2>
+      <p class="section-intro">
+        Test your knowledge with AI-generated quizzes on any topic.
+        Choose your topic, difficulty, and number of questions.
+      </p>
+
+      <!-- Quiz Setup Card -->
+      <div class="card mb-20">
+        <div class="card-title">🧠 Generate a Quiz</div>
+        <div class="quiz-setup-grid">
+          <div class="form-group">
+            <label class="form-label" for="quiz-topic">Topic</label>
+            <input class="form-input" id="quiz-topic" type="text"
+                   placeholder="e.g. React Hooks, Python basics, SQL JOINs…" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="quiz-difficulty">Difficulty</label>
+            <select class="form-select" id="quiz-difficulty">
+              <option value="beginner">🟢 Beginner</option>
+              <option value="intermediate" selected>🟡 Intermediate</option>
+              <option value="advanced">🔴 Advanced</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="quiz-count">Questions</label>
+            <select class="form-select" id="quiz-count">
+              <option value="3">3 questions (quick)</option>
+              <option value="5" selected>5 questions</option>
+              <option value="8">8 questions</option>
+              <option value="10">10 questions</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="generateQuiz()">
+          🚀 Generate a Quiz
+        </button>
+      </div>
+
+      <!-- Quiz content rendered here -->
+      <div id="quiz-area"></div>
+
+    </section>
+
+
+    <!-- ══════════════════════════════
+         SECTION 5 — PROGRESS TRACKER
+    ══════════════════════════════ -->
+    <section class="section" id="section-progress">
+
+      <div class="progress-header">
+        <div>
+          <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px;margin-bottom:4px;">
+            Learning Progress
+          </h2>
+          <p style="font-size:14px;color:var(--text2);">Track your study goals and see how far you've come</p>
+        </div>
+        <button class="btn btn-primary" onclick="toggleAddGoal()">+ Add Goal</button>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="dashboard-stats" style="margin-bottom:24px;">
+        <div class="stat-card">
+          <div class="stat-card-icon">🎯</div>
+          <div class="stat-card-value" id="stat-goals">0</div>
+          <div class="stat-card-label">Total Goals</div>
+          <div class="stat-card-sub" id="stat-done-pct">0% completion</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">✅</div>
+          <div class="stat-card-value" id="stat-done">0</div>
+          <div class="stat-card-label">Completed</div>
+          <div class="stat-card-sub">Topics mastered</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">🔥</div>
+          <div class="stat-card-value" id="stat-streak">0</div>
+          <div class="stat-card-label">Day Streak</div>
+          <div class="stat-card-sub">Keep it going!</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">⏱️</div>
+          <div class="stat-card-value" id="stat-hours">0</div>
+          <div class="stat-card-label">Hours Logged</div>
+          <div class="stat-card-sub">This week</div>
+        </div>
+      </div>
+
+      <!-- Add goal form (hidden by default) -->
+      <div class="add-goal-form" id="add-goal-form">
+        <div class="card-title" style="margin-bottom:14px;">➕ New Learning Goal</div>
+        <div class="add-goal-grid">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="g-title">Goal / Topic</label>
+            <input class="form-input" id="g-title" type="text"
+                   placeholder="e.g. Learn React Hooks" />
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="g-cat">Category</label>
+            <select class="form-select" id="g-cat">
+              <option>Programming</option>
+              <option>Design</option>
+              <option>Data Science</option>
+              <option>Mathematics</option>
+              <option>Language</option>
+              <option>Science</option>
+              <option>Certification</option>
+              <option>Project</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="g-date">Target Date</label>
+            <input class="form-input" id="g-date" type="date" />
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px;">
+          <button class="btn btn-primary" onclick="addGoal()">Save Goal</button>
+          <button class="btn btn-outline"  onclick="toggleAddGoal()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Goals list (rendered by JS) -->
+      <div class="goals-list-wrap" id="goals-list"></div>
+
+      <!-- Activity feed -->
+      <div class="grid-2">
+        <div class="activity-feed">
+          <div class="card-title" style="margin-bottom:8px;">📅 Recent Activity</div>
+          <div id="activity-list"></div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="card">
+          <div class="card-title">🏅 Achievements</div>
+          <div style="display:flex;flex-direction:column;gap:10px;" id="achievements">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:10px;opacity:.4;" id="ach-1">
+              <span style="font-size:24px;">🌱</span>
+              <div>
+                <div style="font-size:13px;font-weight:600;">First Step</div>
+                <div style="font-size:11px;color:var(--text3);">Add your first learning goal</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:10px;opacity:.4;" id="ach-2">
+              <span style="font-size:24px;">🔥</span>
+              <div>
+                <div style="font-size:13px;font-weight:600;">On a Roll</div>
+                <div style="font-size:11px;color:var(--text3);">Complete 3 goals</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:10px;opacity:.4;" id="ach-3">
+              <span style="font-size:24px;">🧠</span>
+              <div>
+                <div style="font-size:13px;font-weight:600;">Quiz Master</div>
+                <div style="font-size:11px;color:var(--text3);">Complete your first quiz</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:10px;opacity:.4;" id="ach-4">
+              <span style="font-size:24px;">⭐</span>
+              <div>
+                <div style="font-size:13px;font-weight:600;">Dedicated Learner</div>
+                <div style="font-size:11px;color:var(--text3);">7-day learning streak</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section><!-- /section-progress -->
+
+
+    <!-- ══════════════════════════════
+         SECTION 6 — PROFILE
+    ══════════════════════════════ -->
+    <section class="section" id="section-profile">
+
+      <!-- Hero Banner -->
+      <div class="profile-hero">
+        <div class="profile-top">
+          <div class="user-avatar" id="hero-avatar">?</div>
+          <div>
+            <div class="profile-name"    id="hero-name">Welcome, Learner!</div>
+            <div class="profile-tagline" id="hero-tagline">
+              Complete your profile to get personalized learning recommendations
+            </div>
+          </div>
+        </div>
+        <div class="profile-chips" id="hero-chips"></div>
+      </div>
+
+      <div class="profile-grid">
+
+        <!-- Personal Info -->
+        <div class="card">
+          <div class="card-title">📋 Personal Information</div>
+          <div class="form-group">
+            <label class="form-label" for="p-name">Full Name</label>
+            <input class="form-input" id="p-name" type="text" placeholder="e.g. Arjun Sharma" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-email">Email Address</label>
+            <input class="form-input" id="p-email" type="email" placeholder="you@email.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-age">Age</label>
+            <input class="form-input" id="p-age" type="number" placeholder="e.g. 21" min="10" max="70"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-location">Location</label>
+            <input class="form-input" id="p-location" type="text" placeholder="City, Country" />
+          </div>
+        </div>
+
+        <!-- Academic Background -->
+        <div class="card">
+          <div class="card-title">🎓 Academic Background</div>
+          <div class="form-group">
+            <label class="form-label" for="p-edu">Education Level</label>
+            <select class="form-select" id="p-edu">
+              <option value="">Select level</option>
+              <option>High School</option>
+              <option>Pursuing Undergraduate</option>
+              <option>Undergraduate Degree</option>
+              <option>Pursuing Postgraduate</option>
+              <option>Postgraduate Degree</option>
+              <option>Self-taught / Bootcamp</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-major">Field of Study / Major</label>
+            <input class="form-input" id="p-major" type="text" placeholder="e.g. Computer Science" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-college">College / Institution</label>
+            <input class="form-input" id="p-college" type="text" placeholder="e.g. IIT Hyderabad" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-year">Graduation Year</label>
+            <input class="form-input" id="p-year" type="text" placeholder="e.g. 2026" />
+          </div>
+        </div>
+
+        <!-- Learning Goals -->
+        <div class="card">
+          <div class="card-title">🎯 Learning Goals</div>
+          <div class="form-group">
+            <label class="form-label" for="p-career">I'm learning / studying</label>
+            <select class="form-select" id="p-career">
+              <option value="">Select a subject</option>
+              <option>Web Development</option>
+              <option>Data Science &amp; AI/ML</option>
+              <option>Cybersecurity</option>
+              <option>UI/UX Design</option>
+              <option>Cloud &amp; DevOps</option>
+              <option>Mobile Development</option>
+              <option>DSA &amp; Competitive Programming</option>
+              <option>Digital Marketing</option>
+              <option>Not decided yet</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-dream">Dream Role / Goal</label>
+            <input class="form-input" id="p-dream" type="text"
+                   placeholder="e.g. SWE at Google, Freelance Designer" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-bio">About You</label>
+            <textarea class="form-textarea" id="p-bio"
+              placeholder="Tell us about yourself, what you're learning and why…"></textarea>
+          </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="card">
+          <div class="card-title">⚡ My Skills</div>
+          <div class="form-group">
+            <label class="form-label">Add a Skill</label>
+            <div style="display:flex;gap:8px;">
+              <input class="form-input" id="skill-input" type="text"
+                     placeholder="e.g. Python, React, Figma…" style="flex:1;"/>
+              <button class="btn btn-ghost" onclick="addSkill()" style="flex-shrink:0;">Add</button>
+            </div>
+          </div>
+          <div class="skills-tags" id="skills-container"></div>
+
+          <div class="divider"></div>
+
+          <div class="form-group">
+            <label class="form-label" for="p-level">Current Experience Level</label>
+            <select class="form-select" id="p-level">
+              <option value="">Select level</option>
+              <option>Complete Beginner</option>
+              <option>Some Knowledge</option>
+              <option>Intermediate</option>
+              <option>Advanced</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-hours">Hours Available Per Week</label>
+            <select class="form-select" id="p-hours">
+              <option value="">Select hours</option>
+              <option>1–5 hrs/week</option>
+              <option>5–10 hrs/week</option>
+              <option>10–20 hrs/week</option>
+              <option>20+ hrs/week</option>
+            </select>
+          </div>
+
+          <div class="flex-end mt-20">
+            <button class="btn btn-primary" onclick="saveProfile()">💾 Save Profile</button>
+          </div>
+        </div>
+
+      </div><!-- /profile-grid -->
+    </section><!-- /section-profile -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<!-- App Logic -->
+<script src="app.js"></script>
+
+</body>
+</html>
