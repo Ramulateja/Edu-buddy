@@ -1,4 +1,4 @@
-**#i have not added the api key in this to prevent stealing the api key.if u want to use u can add your own apikey**
+**#“Edu-Buddy currently requires users to add their own Grok API key to access the AI chatbot, roadmap generator, and quiz features. This approach helps prevent API-related issues. A pre-installed key will be provided in future updates.”**
 
 <h1>👨‍💻#EduBuddy</h1>
 
