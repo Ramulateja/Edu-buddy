@@ -17,7 +17,6 @@ let quizAnswered   = false;
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL   = 'llama-3.3-70b-versatile';
-const OWNER_API_KEY= "add the grok api key";
 const PAGE_TITLES = {
   dashboard: 'Dashboard',
   tutor:     'AI Tutor',
@@ -45,16 +44,123 @@ const CAT_ICONS = {
   Certification:'📜', Project:'🚀', Other:'📌',
 };
 
+/* ── API KEY MANAGEMENT ───────────────────────────────────── */
+
+/** Returns the stored Groq API key, or null if none saved. */
 function getApiKey() {
-  return localStorage.getItem('eb_api_key') || OWNER_API_KEY;
-}
-function onApiKeyFocus() {
-  const stored = localStorage.getItem('eb_api_key');
-  const input  = document.getElementById('api-key-input');
-  if (input && stored) input.value = stored;
+  return localStorage.getItem('eb_api_key') || null;
 }
 
-function onApiKeyBlur() { setTimeout(updateApiKeyStatus, 250); }
+/** Saves user-entered key to localStorage and updates UI. */
+function saveApiKey() {
+  const input = document.getElementById('api-key-input');
+  if (!input) return;
+  const key = input.value.trim();
+  if (!key) {
+    showApiKeyError('⚠️ Please enter your Groq API key before saving.');
+    return;
+  }
+  if (!key.startsWith('gsk_')) {
+    showApiKeyError("⚠️ That doesn't look like a valid Groq key (should start with gsk_).");
+    return;
+  }
+  localStorage.setItem('eb_api_key', key);
+  clearApiKeyError();
+  updateApiKeyStatus();
+  updateTopbarPill();
+  closeKeyModal();
+  showToast('🔑 API key saved!');
+}
+
+/** Removes the stored API key. */
+function clearApiKey() {
+  localStorage.removeItem('eb_api_key');
+  const input = document.getElementById('api-key-input');
+  if (input) input.value = '';
+  updateApiKeyStatus();
+  updateTopbarPill();
+  showToast('🗑️ API key removed.');
+}
+
+/** Toggles password ↔ text visibility on the key input. */
+function toggleApiKeyVisibility() {
+  const input  = document.getElementById('api-key-input');
+  const toggle = document.getElementById('api-key-eye');
+  if (!input || !toggle) return;
+  const isHidden = input.type === 'password';
+  input.type         = isHidden ? 'text' : 'password';
+  toggle.textContent = isHidden ? '🙈' : '👁️';
+}
+
+/** Refreshes the status badge. */
+function updateApiKeyStatus() {
+  const badge = document.getElementById('api-key-status');
+  if (!badge) return;
+  const key = getApiKey();
+  if (key) {
+    badge.textContent = '✅ Key saved';
+    badge.className   = 'api-key-status set';
+  } else {
+    badge.textContent = 'No key saved';
+    badge.className   = 'api-key-status unset';
+  }
+}
+
+function showApiKeyError(msg) {
+  const el = document.getElementById('api-key-error');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+function clearApiKeyError() {
+  const el = document.getElementById('api-key-error');
+  if (el) { el.textContent = ''; el.style.display = 'none'; }
+}
+
+/**
+ * Guards every AI call. Returns the key or throws a user-friendly error
+ * that surfaces in the UI instead of silently failing.
+ */
+function requireApiKey() {
+  const key = getApiKey();
+  if (!key) {
+    throw new Error('No API key found. Please enter your Groq API key in the bar above and click Save Key.');
+  }
+  return key;
+}
+
+/* ── API KEY MODAL ────────────────────────────────────────── */
+function openKeyModal() {
+  // Pre-fill input with stored key (masked) so user can see it's set
+  const stored = getApiKey();
+  const input  = document.getElementById('api-key-input');
+  if (input) input.value = stored || '';
+  clearApiKeyError();
+  document.getElementById('key-modal-backdrop').style.display = 'block';
+  document.getElementById('key-modal').style.display          = 'block';
+  // Small delay so the modal is visible before we focus
+  setTimeout(() => input && input.focus(), 80);
+}
+
+function closeKeyModal() {
+  document.getElementById('key-modal-backdrop').style.display = 'none';
+  document.getElementById('key-modal').style.display          = 'none';
+}
+
+/** Updates the topbar pill (dot colour + label) to reflect key state. */
+function updateTopbarPill() {
+  const pill     = document.getElementById('api-key-pill');
+  const dot      = document.getElementById('api-key-pill-dot');
+  const text     = document.getElementById('api-key-pill-text');
+  if (!pill) return;
+  if (getApiKey()) {
+    dot.classList.add('active');
+    text.textContent = 'API Key ✓';
+    pill.classList.add('has-key');
+  } else {
+    dot.classList.remove('active');
+    text.textContent = 'Add API Key';
+    pill.classList.remove('has-key');
+  }
+}
 
 function navigate(id, el) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -150,14 +256,28 @@ async function sendMessage() {
   const text = inp.value.trim();
   if (!text) return;
 
+  // Validate API key BEFORE touching the UI — no orphaned typing bubbles
+  let apiKey;
+  try {
+    apiKey = requireApiKey();
+  } catch (err) {
+    appendMsg('ai', `⚠️ ${err.message}`);
+    return;
+  }
+
+  // Prevent double-send while a reply is in flight
+  const sendBtn = document.querySelector('.send-btn');
+  if (sendBtn) sendBtn.disabled = true;
+
   appendMsg('user', text);
   inp.value = '';
   msgCount++;
   document.getElementById('msg-count').textContent = msgCount;
   chatHistory.push({ role: 'user', content: text });
 
+  // Remove any stale indicator before showing a fresh one
+  removeTypingIndicator();
   showTypingIndicator();
-  const apiKey = getApiKey();
 
   try {
     const reply = await callGemini(apiKey, buildTutorSystemPrompt(), chatHistory);
@@ -169,6 +289,9 @@ async function sendMessage() {
   } catch (err) {
     removeTypingIndicator();
     appendMsg('ai', `⚠️ ${err.message || 'Something went wrong. Please try again.'}`);
+  } finally {
+    if (sendBtn) sendBtn.disabled = false;
+    inp.focus();
   }
 }
 
@@ -190,6 +313,8 @@ Always respond in a friendly, mentor-like tone.`;
 }
 
 function showTypingIndicator() {
+  // Guard: never show two typing indicators at once
+  removeTypingIndicator();
   const el = document.createElement('div');
   el.className = 'msg ai'; el.id = 'typing';
   el.innerHTML = `<div class="msg-avatar">🎓</div>
@@ -318,7 +443,7 @@ async function generateRoadmap() {
     </div>`;
 
   try {
-    const roadmap = await fetchRoadmapFromGemini(getApiKey());
+    const roadmap = await fetchRoadmapFromGemini(requireApiKey());
     renderRoadmap(roadmap);
     showToast('🗺️ Roadmap ready! Check off topics as you learn.');
   } catch (err) {
@@ -440,7 +565,7 @@ async function generateQuiz() {
     </div>`;
 
   try {
-    quizQuestions = await fetchQuizFromGemini(getApiKey(), topic, diff, count);
+    quizQuestions = await fetchQuizFromGemini(requireApiKey(), topic, diff, count);
     quizIndex = 0; quizScore = 0; quizAnswered = false;
     renderQuizQuestion();
   } catch (err) {
@@ -763,6 +888,8 @@ function renderSkills() {
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('skill-input')?.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();addSkill();} });
+  // Close the API key modal when Escape is pressed
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeKeyModal(); });
 });
 
 
@@ -809,6 +936,13 @@ function init() {
   updateProgressStats();
   initRmAiGuide();
   refreshDashboard();
+
+  // Restore saved API key into the input field (masked) and update status badge
+  const savedKey = getApiKey();
+  const keyInput = document.getElementById('api-key-input');
+  if (savedKey && keyInput) keyInput.value = savedKey;
+  updateApiKeyStatus();
+  updateTopbarPill();
 
   const lastVisit = localStorage.getItem('eb_last_visit');
   const today     = new Date().toDateString();

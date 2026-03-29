@@ -81,10 +81,52 @@
   <header class="topbar">
     <div class="page-title" id="page-title">Dashboard</div>
     <div class="topbar-right">
+      <!-- API Key status pill — click to open the key modal -->
+      <button class="api-key-pill" id="api-key-pill" onclick="openKeyModal()" title="Manage Groq API Key">
+        <span class="api-key-pill-dot" id="api-key-pill-dot"></span>
+        <span class="api-key-pill-text" id="api-key-pill-text">Add API Key</span>
+      </button>
       <div class="topbar-btn" title="Notifications">🔔</div>
       <div class="topbar-btn" title="Help">❓</div>
     </div>
   </header>
+
+  <!-- ── API KEY MODAL ─────────────────────────────────────── -->
+  <div class="key-modal-backdrop" id="key-modal-backdrop" onclick="closeKeyModal()" style="display:none;"></div>
+  <div class="key-modal" id="key-modal" style="display:none;">
+    <div class="key-modal-header">
+      <div class="key-modal-title">🔑 Groq API Key</div>
+      <button class="key-modal-close" onclick="closeKeyModal()">✕</button>
+    </div>
+    <p class="key-modal-desc">
+      EduBuddy uses the <strong>Groq API</strong> for all AI features.
+      Your key is stored only in your browser — never sent to any server other than Groq.
+    </p>
+    <div class="key-modal-input-row">
+      <div class="api-key-bar-input-wrap">
+        <input
+          type="password"
+          id="api-key-input"
+          class="api-key-bar-input"
+          placeholder="Paste your key here (gsk_…)"
+          autocomplete="off"
+          spellcheck="false"
+          onkeydown="if(event.key==='Enter') saveApiKey()"
+        />
+        <button class="api-key-eye-btn" id="api-key-eye" onclick="toggleApiKeyVisibility()" title="Show / hide key">👁️</button>
+      </div>
+    </div>
+    <div class="api-key-error" id="api-key-error" style="display:none;"></div>
+    <div class="key-modal-actions">
+      <button class="btn btn-primary" onclick="saveApiKey()">💾 Save Key</button>
+      <button class="btn btn-ghost"   onclick="clearApiKey()">🗑️ Remove Key</button>
+      <span class="api-key-status unset" id="api-key-status">No key saved</span>
+    </div>
+    <div class="key-modal-hint">
+      Don't have a key?
+      <a href="https://console.groq.com/keys" target="_blank" rel="noopener">Get one free at console.groq.com →</a>
+    </div>
+  </div>
 
   <div class="content">
     <section class="section active" id="section-dashboard">
@@ -191,8 +233,7 @@
          SECTION 2 — AI TUTOR
     ══════════════════════════════ -->
     <section class="section" id="section-tutor">
-
-      <p class="section-intro">
+<p class="section-intro">
         Your personal AI learning mentor. Ask anything — concepts, study plans,
         explanations, or what to learn next.
       </p>
@@ -285,8 +326,7 @@
          SECTION 3 — LEARNING ROADMAP
     ══════════════════════════════ -->
     <section class="section" id="section-roadmap">
-
-      <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px;">
+<h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px;">
         Learning Roadmap
       </h2>
       <p class="section-intro">
@@ -397,8 +437,7 @@
          SECTION 4 — QUIZ GENERATOR
     ══════════════════════════════ -->
     <section class="section" id="section-quiz">
-
-      <h2 style="font-family:Poppins, sans-serif;font-weight:800;font-size:22px;margin-bottom:6px;">
+<h2 style="font-family:Poppins, sans-serif;font-weight:800;font-size:22px;margin-bottom:6px;">
         Quiz Generator
       </h2>
       <p class="section-intro">
@@ -722,7 +761,7 @@
 <div class="toast" id="toast"></div>
 
 <!-- App Logic -->
-<script src="app.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
